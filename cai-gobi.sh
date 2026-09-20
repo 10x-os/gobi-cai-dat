@@ -12,23 +12,23 @@
 # chỉ phải tải về đúng một thứ.
 #
 # 🔴 Luật của tệp này, giữ giùm khi sửa:
-#   · Mật khẩu, mã băm mật khẩu và mã truy cập ⛔ được in ra màn hình hay ghi vào nhật ký.
-#   · Chạy lại bao nhiêu lần cũng ⛔ được hỏng thứ đã có.
+#   · Mật khẩu, mã băm mật khẩu và mã truy cập không được in ra màn hình hay ghi vào nhật ký.
+#   · Chạy lại bao nhiêu lần cũng không được hỏng thứ đã có.
 #   · Mọi câu báo lỗi phải nói được CÁCH SỬA, bằng tiếng Việt người thường đọc hiểu.
 
 set -euo pipefail
 
 # ── Hằng số ─────────────────────────────────────────────────────────────────────────────────────
 KHO_ANH_MAC_DINH="${GOBI_KHO_ANH:-ghcr.io/10x-os/gobi}"
-MAY_CHU_KHO="${KHO_ANH_MAC_DINH%%/*}"   # lấy từ chính tên kho, ⛔ gõ lại ở hai chỗ rồi lệch nhau
+MAY_CHU_KHO="${KHO_ANH_MAC_DINH%%/*}"   # lấy từ chính tên kho, đừng gõ lại ở hai chỗ rồi lệch nhau
 
-# Bản sẽ cài nếu không ai nói gì khác. ⛔ đổi thành `latest`: `latest` trỏ đi đâu là chuyện của
-# hôm đó, nên máy sẽ chạy một bản khác với bản người hỗ trợ đang cầm mà ⛔ ai biết. Bản cụ thể thì
+# Bản sẽ cài nếu không ai nói gì khác. Đừng đổi thành `latest`: `latest` trỏ đi đâu là chuyện của
+# hôm đó, nên máy sẽ chạy một bản khác với bản người hỗ trợ đang cầm mà không ai biết. Bản cụ thể thì
 # truyền `--ban <tên bản>`.
 BAN_MAC_DINH="${GOBI_BAN:-on-dinh}"
 
 THU_MUC="${GOBI_THU_MUC:-/opt/gobi}"
-# ⚠️ Đặt ở ĐÂY, ⛔ đặt trong `lay_ma()`: hàm đó luôn được gọi trong `$( )`, tức là một tiến trình
+# ⚠️ Đặt ở ĐÂY, đừng đặt trong `lay_ma()`: hàm đó luôn được gọi trong `$( )`, tức là một tiến trình
 # CON — mọi phép gán trong đó chết theo tiến trình con, và `luu_ma()` sau đó cầm một biến RỖNG.
 TEP_MA="$THU_MUC/ma-truy-cap"
 
@@ -90,7 +90,7 @@ doc_env() {  # doc_env <TEN_BIEN> — đọc một biến trong .env, KHÔNG in 
 }
 
 # ── Mã truy cập phần mềm ────────────────────────────────────────────────────────────────────────
-lay_ma() {  # in mã ra stdout cho hàm gọi hứng — ⛔ ghi log, ⛔ hiện màn hình
+lay_ma() {  # in mã ra stdout cho hàm gọi hứng — không ghi log, không hiện màn hình
   if [ -n "$TOKEN_TEP" ]; then
     [ -r "$TOKEN_TEP" ] || loi "Không đọc được tệp mã truy cập «${TOKEN_TEP}»." \
         "Kiểm lại đường dẫn — gõ «ls ${TOKEN_TEP}» xem tệp có thật ở đó không."
@@ -102,7 +102,7 @@ lay_ma() {  # in mã ra stdout cho hàm gọi hứng — ⛔ ghi log, ⛔ hiện
   fi
 }
 
-luu_ma() {  # giữ mã lại để lần `capnhat` sau ⛔ phải dán mã lại
+luu_ma() {  # giữ mã lại để lần `capnhat` sau không phải dán mã lại
   [ -n "$TEP_MA" ] || loi "Lỗi bên trong lệnh cài (chưa biết cất mã ở đâu)." "Báo người phụ trách kèm câu này."
   [ "$KHONG_LUU_MA" -eq 1 ] && { rm -f "$TEP_MA"; return 0; }
   mkdir -p "$THU_MUC"
@@ -113,7 +113,7 @@ luu_ma() {  # giữ mã lại để lần `capnhat` sau ⛔ phải dán mã lạ
 kiem_mang_kho_anh() {
   # Tách «mạng hỏng» khỏi «mã sai» TRƯỚC khi đăng nhập. Thiếu bước này thì hai chuyện rất khác nhau
   # cùng hiện ra một câu, và người dùng đi sửa nhầm thứ.
-  # ⚠️ ⛔ thêm `|| echo 000` ở đây: hỏng mạng thì curl ĐÃ in «000» rồi MỚI thoát khác 0, nên cái
+  # ⚠️ Đừng thêm `|| echo 000` ở đây: hỏng mạng thì curl ĐÃ in «000» rồi MỚI thoát khác 0, nên cái
   # `||` in thêm một lần nữa ⇒ chuỗi thành «000 000», khác «000», và phép kiểm này lọt — máy mất
   # mạng mà script đổ oan cho cái mã. Lấy 3 ký tự cuối cho chắc.
   [ -n "${GOBI_KHO_ANH:-}" ] && return 0
@@ -262,15 +262,15 @@ hoi_email() {
 
 # ── Kéo ảnh ─────────────────────────────────────────────────────────────────────────────────────
 dang_nhap_kho_anh() {
-  # Mỗi người một mã riêng: mã của bạn chỉ mở được kho phần mềm Gobi, và huỷ được riêng mà ⛔ ảnh
+  # Mỗi người một mã riêng: mã của bạn chỉ mở được kho phần mềm Gobi, và huỷ được riêng mà không ảnh
   # hưởng ai khác.
   #
   # 🔴 Ba luật của mã trong script này, giữ giùm khi sửa:
-  #   ① ⛔ nhúng cứng bất cứ mã nào vào mã nguồn.
-  #   ② ⛔ in mã ra màn hình, ⛔ ghi vào nhật ký, ⛔ nhận qua tham số dòng lệnh trần — dòng lệnh hiện
+  #   ① Không nhúng cứng bất cứ mã nào vào mã nguồn.
+  #   ② Không in mã ra màn hình, không ghi vào nhật ký, không nhận qua tham số dòng lệnh trần — dòng lệnh hiện
   #      trong `ps` của mọi người dùng trên máy. Chỉ nhận qua BIẾN MÔI TRƯỜNG hoặc TỆP.
   #   ③ Mã chỉ nằm ĐÚNG MỘT CHỖ trên đĩa: `$THU_MUC/ma-truy-cap`, chmod 600, và lệnh `go` xoá nó.
-  #      Kéo xong là ĐĂNG XUẤT khỏi kho ⇒ mã ⛔ nằm lại trong cấu hình của Docker, nơi nó sẽ bị
+  #      Kéo xong là ĐĂNG XUẤT khỏi kho ⇒ mã không nằm lại trong cấu hình của Docker, nơi nó sẽ bị
   #      kéo theo mỗi lần ai đó sao lưu hay chép thư mục của root đi nơi khác.
   if [ -n "$ANH_TU_CHI_DINH" ]; then
     canh "Đang dùng bản cài chỉ định sẵn: $ANH_TU_CHI_DINH"
@@ -289,7 +289,7 @@ dang_nhap_kho_anh() {
         "Chưa ai gửi mã thì nhắn xin — đừng mượn mã của người khác, mã của họ không mở cho bạn."
   fi
 
-  kiem_mang_kho_anh   # ③ MẠNG HỎNG — tách ra TRƯỚC, để ⛔ đổ oan cho cái mã
+  kiem_mang_kho_anh   # ③ MẠNG HỎNG — tách ra TRƯỚC, để không đổ oan cho cái mã
 
   local bao_loi nguoi="${GOBI_NGUOI_DUNG_KHO:-gobi-hoc-vien}"
   if bao_loi=$(printf '%s' "$ma" | docker login "$MAY_CHU_KHO" -u "$nguoi" --password-stdin 2>&1 >/dev/null); then
@@ -298,7 +298,7 @@ dang_nhap_kho_anh() {
     return 0
   fi
 
-  # ⚠️ ⛔ ĐƯA `$bao_loi` RA MÀN HÌNH: đó là câu tiếng Anh của công cụ, người dùng ⛔ hiểu, và có trường
+  # ⚠️ ĐỪNG ĐƯA `$bao_loi` RA MÀN HÌNH: đó là câu tiếng Anh của công cụ, người dùng không hiểu, và có trường
   # hợp nó chép lại một phần thứ vừa gửi đi. Chỉ ĐỌC nó để đoán đúng loại lỗi rồi nói bằng lời mình.
   case "$bao_loi" in
     # ── ② MÃ SAI HOẶC ĐÃ BỊ HUỶ ────────────────────────────────────────────────────────────────
@@ -317,7 +317,7 @@ dang_nhap_kho_anh() {
 dang_xuat_kho_anh() {
   # Kéo xong là đăng xuất. Mã nằm trong cấu hình của Docker là nằm dạng chữ thường, và bị kéo theo
   # mỗi lần ai đó sao lưu hay chép thư mục của root đi nơi khác. Bản của mình vẫn giữ ở `$TEP_MA`
-  # để lần `capnhat` sau ⛔ phải dán lại mã.
+  # để lần `capnhat` sau không phải dán lại mã.
   [ -n "$ANH_TU_CHI_DINH" ] && return 0
   docker logout "$MAY_CHU_KHO" >/dev/null 2>&1 || true
 }
@@ -340,7 +340,7 @@ keo_anh() {
   fi
   dang_xuat_kho_anh
 
-  # Lỗi lúc KÉO, khác lỗi lúc đăng nhập: mã đúng nhưng ⛔ mở cho đúng bản này, hoặc bản ⛔ tồn tại.
+  # Lỗi lúc KÉO, khác lỗi lúc đăng nhập: mã đúng nhưng không mở cho đúng bản này, hoặc bản đó không tồn tại.
   case "$bao_loi" in
     *"not found"*|*"manifest unknown"*|*"not exist"*)
       loi "Kho không có bản tên «${BAN}»." \
@@ -403,10 +403,10 @@ sinh_ma_bam() {
 ghi_compose() {
 cat >"$THU_MUC/docker-compose.yml" <<'HET_COMPOSE'
 # Gobi — bản chạy trên máy chủ riêng của bạn.
-# ⛔ Sửa tay tệp này. Nó được lệnh cài ghi lại mỗi lần chạy, sửa gì cũng mất.
+# ĐỪNG sửa tay tệp này. Nó được lệnh cài ghi lại mỗi lần chạy, sửa gì cũng mất.
 #
 # Hai container:
-#   gobi          — ứng dụng. ⛔ mở cổng ra ngoài, chỉ nói chuyện với cổng vào qua mạng nội bộ.
+#   gobi          — ứng dụng. Không mở cổng ra ngoài, chỉ nói chuyện với cổng vào qua mạng nội bộ.
 #   gobi-cong-vao — giữ cổng 80/443, tự xin và tự gia hạn chứng chỉ bảo mật (HTTPS).
 
 name: gobi
@@ -417,7 +417,7 @@ services:
     container_name: gobi
     restart: unless-stopped
     # Trần bộ nhớ của ứng dụng. Lúc nặng nhất nó ăn quãng một phần tư chỗ này, nên trần đang rộng
-    # rãi có chủ đích — ⛔ hạ xuống sát mức đo được rồi để container bị giết lúc gặp tài liệu dài.
+    # rãi có chủ đích — đừng hạ xuống sát mức đo được rồi để container bị giết lúc gặp tài liệu dài.
     mem_limit: 768m
     cpus: 1.0
     # Ứng dụng là tiến trình số 1 trong container — cho nó đủ thời gian đóng dữ liệu khi tắt.
@@ -425,7 +425,7 @@ services:
     expose:
       - "7391"
     environment:
-      # Bắt buộc. Thiếu là cổng đăng nhập đóng (503) — cấu hình hỏng ⛔ được là cửa mở.
+      # Bắt buộc. Thiếu là cổng đăng nhập đóng (503) — cấu hình hỏng không được là cửa mở.
       - GOBI_PASSWORD_HASH=${GOBI_PASSWORD_HASH:?Thiếu mật khẩu trong .env — chạy lại lệnh cài}
       - GIT_SHA=${GOBI_BAN:-}
       # Khoá của nhà cung cấp AI: để trống thì bạn tự dán khoá trong phần Cài đặt của app.
@@ -437,8 +437,8 @@ services:
       # Nút «Báo lỗi»: để trống thì nút vẫn hiện nhưng báo «chưa nối trạm báo lỗi».
       - GOBI_INTAKE_URL=${GOBI_INTAKE_URL:-}
       - GOBI_INTAKE_TOKEN=${GOBI_INTAKE_TOKEN:-}
-      # ⛔ Thêm API_SERVER_KEY vào đây: có biến đó là mọi lượt trò chuyện bị từ chối.
-      # GOBI_HOSTED=1 đã nằm sẵn trong ảnh — ⛔ đặt lại ở đây.
+      # ĐỪNG thêm API_SERVER_KEY vào đây: có biến đó là mọi lượt trò chuyện bị từ chối.
+      # GOBI_HOSTED=1 đã nằm sẵn trong ảnh — đừng đặt lại ở đây.
     volumes:
       - gobi-du-lieu:/data    # 🔴 MẤT VOLUME NÀY LÀ MẤT TOÀN BỘ KHO CỦA BẠN
     networks:
@@ -477,7 +477,7 @@ HET_COMPOSE
 ghi_caddyfile() {
 cat >"$THU_MUC/Caddyfile" <<'HET_CADDY'
 # Cổng vào của Gobi — giữ cổng 80/443, tự xin chứng chỉ HTTPS, chuyển tiếp vào ứng dụng.
-# ⛔ Sửa tay: lệnh cài ghi lại tệp này mỗi lần chạy.
+# ĐỪNG sửa tay: lệnh cài ghi lại tệp này mỗi lần chạy.
 {
 	email {$GOBI_EMAIL}
 }
@@ -502,7 +502,7 @@ ghi_env() {
 
   ( umask 077
     cat >"$THU_MUC/.env" <<HET_ENV
-# Gobi — cấu hình máy chủ của bạn. 🔴 TỆP NÀY CHỨA MẬT KHẨU ĐÃ MÃ HOÁ, ⛔ gửi cho ai.
+# Gobi — cấu hình máy chủ của bạn. 🔴 TỆP NÀY CHỨA MẬT KHẨU ĐÃ MÃ HOÁ, đừng gửi cho ai.
 # Lệnh cài ghi lại tệp này mỗi lần chạy; mấy dòng khoá AI bên dưới thì được giữ nguyên.
 GOBI_ANH=$ANH
 GOBI_BAN=$BAN
@@ -677,16 +677,16 @@ HET_CANH
   printf '\n  Đang gỡ...\n'
   docker_compose down -v --remove-orphans >/dev/null 2>&1 || true
   docker rm -f gobi gobi-cong-vao >/dev/null 2>&1 || true
-  rm -f "$THU_MUC/ma-truy-cap"        # mã truy cập ⛔ được ở lại sau khi gỡ
+  rm -f "$THU_MUC/ma-truy-cap"        # mã truy cập không được ở lại sau khi gỡ
   rm -rf "$THU_MUC"
   docker logout "$MAY_CHU_KHO" >/dev/null 2>&1 || true
   printf '\n  ✓ Đã gỡ sạch Gobi khỏi máy chủ này.\n\n'
 }
 
 viec_nhat_ky() {
-  # Gom nhật ký của cả hai container vào một lệnh, để người gặp trục trặc ⛔ phải nhớ tên container
-  # nào cũng ⛔ phải gõ hai lệnh. In NGUYÊN VĂN, ⛔ lọc chữ nào: lọc là tự bịt mắt mình trước đúng
-  # thứ cần nhìn, và dòng bẩn thì phải sửa ở chỗ sinh ra nó chứ ⛔ phải giấu ở đây.
+  # Gom nhật ký của cả hai container vào một lệnh, để người gặp trục trặc không phải nhớ tên container
+  # nào cũng không phải gõ hai lệnh. In NGUYÊN VĂN, đừng lọc chữ nào: lọc là tự bịt mắt mình trước đúng
+  # thứ cần nhìn, và dòng bẩn thì phải sửa ở chỗ sinh ra nó chứ không phải giấu ở đây.
   [ -d "$THU_MUC" ] || loi "Chưa thấy Gobi được cài trên máy này." "Cài trước đã:  sudo $0 cai"
   printf '\n─── Nhật ký ứng dụng (50 dòng cuối) ───\n'
   docker logs --tail 50 gobi 2>&1 || printf '  (không đọc được — Gobi chưa chạy)\n'
